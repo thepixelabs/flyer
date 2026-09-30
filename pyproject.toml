@@ -1,0 +1,17 @@
+[project]
+name = "flyer"
+version = "0.1.0"
+description = "A simulated FlyWire fly brain chooses its favourite taste and smell blend; a local image model draws its response"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "pillow>=12.3.0",
+    "pyarrow>=25.0.1",
+    "scipy>=1.18.1",
+    "torch>=2.14.0",
+    "uvicorn[standard]>=0.54.0",
+    "websocket-client>=1.9.2",
+]

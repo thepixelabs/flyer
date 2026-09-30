@@ -1,0 +1,36 @@
+# Downloaded datasets and generated runs (repo root only)
+/data/
+/out/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Model weights and large binaries
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.npy
+*.parquet
+
+# Secrets and local config
+.env
+.env.*
+
+# Editor, OS and local tooling
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+.claude/
+*.log

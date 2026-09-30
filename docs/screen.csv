@@ -1,0 +1,64 @@
+channel,kind,receptor,detects,change_in_mn9_hz,standard_error_hz,beyond_noise
+labellar water sensors,taste,ppk28,water,7.0,1.6,higher
+labellar low-salt sensors,taste,,,4.9,1.4,higher
+"pharyngeal (throat) taste, group 2",taste,,,4.2,1.5,higher
+"accessory pharyngeal taste, group 1",taste,,,3.0,1.5,higher
+DL3,smell,Or65a,cVA,2.8,1.5,no
+"pharyngeal (throat) taste, group 3",taste,,,1.7,1.3,no
+VA7l,smell,Or46a,,1.5,1.7,no
+VM5d,smell,Or85b,,1.5,1.6,no
+VC3,smell,Or35a,,1.4,1.7,no
+DC2,smell,Or13a,octenol,1.0,1.8,no
+DA2,smell,Or56a,"geosmin, mould",0.8,1.7,no
+"accessory pharyngeal taste, group 2",taste,,,0.7,1.4,no
+"pharyngeal (throat) taste, group 1",taste,,,0.5,1.8,no
+VC4,smell,Or67c,,0.5,1.7,no
+VM7d,smell,Or42a,fruity esters,0.3,1.7,no
+VA5,smell,Or49b,cresols,0.2,1.4,no
+VA7m,smell,,,0.2,1.3,no
+VA1v,smell,Or47b,fly odours (pheromone),0.2,1.7,no
+DL4,smell,Or49a/Or85f,parasitoid wasp odour,0.1,1.7,no
+DL5,smell,Or7a,green leaf volatiles (E2-hexenal),0.1,1.4,no
+VC2,smell,Or71a,,0.1,1.5,no
+VM6l,smell,,,0.1,1.9,no
+DM6,smell,Or67a,,0.0,1.8,no
+V,smell,Gr21a/Gr63a,carbon dioxide,0.0,1.6,no
+VA1d,smell,Or88a,fly odours,-0.0,1.3,no
+DL1,smell,Or10a,methyl salicylate,-0.1,1.8,no
+taste pegs inside the mouth,taste,,,-0.2,1.4,no
+VM5v,smell,Or98a,,-0.3,1.6,no
+DA4m,smell,Or2a,,-0.6,1.5,no
+DA4l,smell,Or43a,cyclohexanol,-0.8,1.4,no
+DM2,smell,Or22a,fruity esters (ethyl hexanoate),-0.8,1.6,no
+DM3,smell,Or47a,pentyl acetate,-1.0,1.7,no
+DL2d,smell,Ir75b/c,short-chain acids,-1.3,1.5,no
+DA3,smell,Or23a,,-1.5,1.4,no
+VL1,smell,Ir75d,,-1.6,1.6,no
+VM3,smell,Or9a,,-1.8,1.8,no
+VM7v,smell,Or59c,,-1.8,1.7,no
+VC1,smell,Or33c,,-1.9,1.5,no
+VM6m,smell,,,-2.0,1.5,no
+DM5,smell,Or85a,ethyl 3-hydroxybutyrate,-2.3,1.7,no
+VM2,smell,Or43b,ethyl butyrate,-2.3,1.6,no
+VA3,smell,Or67b,,-2.6,1.8,no
+VM1,smell,Ir92a,"ammonia, amines",-3.5,1.7,lower
+DL2v,smell,Ir75b/c,short-chain acids,-3.6,2.1,no
+VA2,smell,Or92a,"diacetyl, yeast",-3.6,1.7,lower
+VA4,smell,Or85d,,-3.9,1.7,lower
+DC4,smell,Ir64a,acids,-4.3,1.5,lower
+DM1,smell,Or42b,"ethyl acetate, fermenting fruit",-4.3,1.7,lower
+VM4,smell,Ir76a,,-5.7,1.9,lower
+DM4,smell,Or59b,methyl acetate,-6.1,1.5,lower
+D,smell,Or69a,"terpenes, fruit volatiles",-6.8,1.7,lower
+VL2a,smell,Ir84a,phenylacetaldehyde,-6.8,1.4,lower
+VA6,smell,Or82a,geranyl acetate,-7.1,2.0,lower
+DC3,smell,Or83c,"farnesol, citrus peel",-7.4,1.6,lower
+DC1,smell,Or19a,citrus terpenes (valencene),-7.4,1.3,lower
+VL2p,smell,Ir31a,,-7.9,1.9,lower
+VC5,smell,Ir41a,amines,-9.0,1.8,lower
+DP1l,smell,Ir75a,"acetic acid, vinegar",-9.5,1.9,lower
+taste sensors arriving from the legs/body,taste,,,-10.2,1.5,lower
+DA1,smell,Or67d,"cVA, male pheromone",-11.9,1.7,lower
+VM6v,smell,,,-12.0,1.9,lower
+DP1m,smell,Ir64a,acids,-18.3,2.1,lower
+labellar bitter sensors,taste,,,-26.7,1.8,lower

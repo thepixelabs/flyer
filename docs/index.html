@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flyer: we asked a fly brain what it wants to eat</title>
+  <meta name="description" content="A simulated fruit-fly brain, built from the real FlyWire wiring map, chooses its favourite taste blend. Then its response is drawn.">
+  <link rel="canonical" href="https://flyer.pixelabs.net/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Flyer">
+  <meta property="og:title" content="Flyer: we asked a fly brain what it wants to eat">
+  <meta property="og:description" content="A simulated fruit-fly brain chooses its favourite taste blend, and we draw what its brain did.">
+  <meta property="og:url" content="https://flyer.pixelabs.net/">
+  <meta property="og:image" content="https://flyer.pixelabs.net/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0b0c12">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Flyer, top of page"><b>Fly</b>er</a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#drawings">Drawings</a>
+      <a href="#app">The app</a>
+      <a href="#limits">Limits</a>
+      <a class="go" href="https://github.com/thepixelabs/flyer">Get Flyer</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">FlyWire connectome · spiking simulation</p>
+      <h1>We asked a fly brain what it wants to eat.</h1>
+      <p class="lede">Scientists mapped every neuron in a fruit fly's brain and shared the wiring with the world. Flyer switches that map on inside a computer, all 138,639 neurons of it, and lets it taste things. Sugar was always on the table. On top of it, the brain reached for water, a little salt and something from the throat. It never once picked a smell. Then we drew what its brain did.</p>
+      <div class="btns">
+        <a class="btn primary" href="#result">See what it picked</a>
+        <a class="btn" href="https://github.com/thepixelabs/flyer">Run it yourself</a>
+      </div>
+    </div>
+    <figure>
+      <img class="frame" src="img/free.webp" width="1344" height="768" alt="A fly brain drawn as an antique ink plate: the two optic lobes branch like trees on either side of the central brain, with fine lines connecting them.">
+      <figcaption>Not a photo, and not a food. This is what the brain's response looks like, drawn from the neurons that fired.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<aside class="credit" aria-labelledby="credit-h">
+  <div class="wrap">
+    <h2 id="credit-h">We didn't make the brain, we borrowed it.</h2>
+    <p>The wiring map is the <a href="https://flywire.ai/">FlyWire</a> connectome, built by the <strong>FlyWire Consortium</strong>: hundreds of scientists led from <strong>Princeton University</strong>, with <strong>Janelia Research Campus</strong> and the <strong>MRC Laboratory of Molecular Biology</strong>, working from electron-microscope images of a real fly's brain. It is open data (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>). Browse it on <a href="https://codex.flywire.ai/">Codex</a>, download it on <a href="https://doi.org/10.5281/zenodo.10676866">Zenodo</a>, or read the paper: <a href="https://doi.org/10.1038/s41586-024-07558-y">Dorkenwald et al., <em>Nature</em> 2024</a>.</p>
+    <p>The simulation model comes from <a href="https://github.com/philshiu/Drosophila_brain_model">Shiu et al.</a> (<a href="https://doi.org/10.1038/s41586-024-07763-9"><em>Nature</em> 2024</a>). What Flyer adds is the experiment that asks the brain what it likes, and the drawings of its answer.</p>
+  </div>
+</aside>
+
+<section id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 id="how-h">How do you ask a brain what it likes?</h2>
+    <p class="lede">You can't just ask a brain. So we gave it no menu and no recipes. We started with sugar, added every other taste and smell one at a time, and watched the neuron that drives feeding. Whatever the brain liked, it had to show in its wiring.</p>
+    <ol class="steps">
+      <li><h3>Try everything</h3><p>All 63 channels (10 tastes, 53 smells) are added to sugar, one by one, for 16 simulated trials each.</p></li>
+      <li><h3>Check again</h3><p>Anything that looked even slightly promising is measured again, 64 trials each. Plenty of early hopefuls fade back into noise here.</p></li>
+      <li><h3>Build a blend</h3><p>The survivors are stacked on top of each other, best first, until the next addition stops helping.</p></li>
+      <li><h3>Confirm</h3><p>The finished blend races sugar alone in a fresh batch of 32 trials. In run 3, MN9 fired at 48.1 ± 0.9 Hz on sugar and 63.1 ± 0.8 Hz with the blend.</p></li>
+    </ol>
+    <div id="result" class="answer">
+      <h3>Water, salt and a throat taste.</h3>
+    <div class="result-grid">
+      <div>
+        <p>Sugar was always on. On top of it, the brain picked water, a little salt and one throat taste. We ran the whole search six times, each from fresh random noise, and the answer never changed. No smell was ever picked, and most of them made the fly less keen to eat.</p>
+      </div>
+      <figure class="chart">
+        <figcaption class="chart-title">What each channel did to feeding <span>(change in the feeding neuron's spikes per second, run 3)</span></figcaption>
+        <ul class="diverge">
+          <li><span class="dl">Water</span><span class="dt" aria-hidden="true"><span class="db pos" style="--w:13.0%"></span></span><span class="dv">+7.0</span></li>
+          <li><span class="dl">Low salt</span><span class="dt" aria-hidden="true"><span class="db pos" style="--w:9.1%"></span></span><span class="dv">+4.9</span></li>
+          <li><span class="dl">Throat taste</span><span class="dt" aria-hidden="true"><span class="db pos" style="--w:7.8%"></span></span><span class="dv">+4.2</span></li>
+          <li><span class="dl">Citrus smell</span><span class="dt" aria-hidden="true"><span class="db neg" style="--w:13.7%"></span></span><span class="dv">−7.4</span></li>
+          <li><span class="dl">Vinegar smell</span><span class="dt" aria-hidden="true"><span class="db neg" style="--w:17.6%"></span></span><span class="dv">−9.5</span></li>
+          <li><span class="dl">Bitter</span><span class="dt" aria-hidden="true"><span class="db neg" style="--w:49.4%"></span></span><span class="dv">−26.7</span></li>
+        </ul>
+      </figure>
+    </div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <h3>The 63 channels</h3>
+        <p><strong>10 tastes:</strong> water, low salt, bitter, the taste pegs inside the mouth, three pharyngeal (throat) groups, two accessory pharyngeal groups, and taste sensors from the legs and body.</p>
+        <p><strong>53 smells:</strong> one for each group of smell receptor neurons in the antenna, from fruity esters and vinegar to citrus, carbon dioxide and pheromones. Each channel switches on just that group's sensory neurons.</p>
+      </div>
+      <div>
+        <h3>Why no smell?</h3>
+        <p>Four tastes raised feeding beyond noise. No smell did: 18 pushed it down and the other 35 changed nothing. MN9 measures the act of feeding, so this says which inputs make the brain eat, not which ones a fly likes the scent of. Smell may matter more for finding food, and this experiment doesn't measure that.</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top:2rem">The brain is the FlyWire connectome (not ours, see the credit above): 138,639 neurons and about 15 million connections between them, simulated as a leaky integrate-and-fire network. In plain words, each neuron collects input, leaks a little, and fires once it has had enough. We ported Shiu et al.'s model (<em>Nature</em>, 2024) to PyTorch and changed one thing: in the original, a single smell neuron could set off thousands of others, so we corrected how the smell signals are signed. Taste behaves just as in the paper. The details are in the <a href="https://github.com/thepixelabs/flyer#what-was-changed-from-shiu-et-al-and-why">README</a>.</p>
+  </div>
+</section>
+
+<section id="drawings" aria-labelledby="drawings-h">
+  <div class="wrap">
+    <p class="eyebrow">The portrait</p>
+    <h2 id="drawings-h">Then we drew what its brain did.</h2>
+    <p class="lede">The neurons that fired, at their real places in the brain, and the connections between them, become a picture. Our code draws them two ways: a colourful data portrait and a bare line map. The line map goes to an image model (SDXL with a ControlNet), which is asked for an old scientific ink plate, never for food. These four pictures come from run 3.</p>
+    <div class="grid four">
+      <figure class="plate"><img class="frame" src="img/data-672.webp" srcset="img/data-672.webp 672w, img/data-1008.webp 1008w, img/data.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="The data portrait: dots for neurons that fired, coloured by first spike, joined by thin connection lines."><figcaption><strong>1. Data portrait.</strong> Straight from the data. Each dot is a neuron that fired, each line a strong connection.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/control.png" width="1344" height="768" loading="lazy" alt="The line map: the brain outline and connections as bare white lines on black."><figcaption><strong>2. Line map.</strong> The same thing as bare lines. This is all the image model gets to see.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/free-672.webp" srcset="img/free-672.webp 672w, img/free-1008.webp 1008w, img/free.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="The free drawing: an ink plate of the brain that follows the line map but adds its own flourishes."><figcaption><strong>3. Free drawing.</strong> The model follows the lines but can't resist embellishing. About 27% of its strongest lines sit on real data; random lines would manage 21%.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/strict-672.webp" srcset="img/strict-672.webp 672w, img/strict-1008.webp 1008w, img/strict.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="The strict drawing: the same ink plate with everything away from real data lines faded to paper."><figcaption><strong>4. Strict drawing.</strong> Only ink near a real data line survives; the rest fades to paper. 74% of its strongest lines sit on the data.</figcaption></figure>
+    </div>
+
+    <h3 style="margin-top:3rem">Same brain, other moods</h3>
+    <p class="muted">Change the style, the colours or the angle, and the same response looks like a different picture. Four plates from one saved run:</p>
+    <div class="grid four">
+      <figure class="plate"><img class="frame" src="img/gallery-cajal-672.webp" srcset="img/gallery-cajal-672.webp 672w, img/gallery-cajal.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="A fly brain in fine pen and ink on cream paper."><figcaption><strong>Cajal ink plate.</strong> Pen and ink on old paper, the way early neuroanatomists drew.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/gallery-etching-672.webp" srcset="img/gallery-etching-672.webp 672w, img/gallery-etching.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="The brain seen from the side and above as a copper-brown etching."><figcaption><strong>Etching.</strong> Turned and tilted, coloured by the data.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/gallery-cyanotype-672.webp" srcset="img/gallery-cyanotype-672.webp 672w, img/gallery-cyanotype.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="The brain as a white cyanotype print on deep blue."><figcaption><strong>Cyanotype.</strong> White on blue, like a sun print.</figcaption></figure>
+      <figure class="plate"><img class="frame" src="img/gallery-cajal-data-672.webp" srcset="img/gallery-cajal-data-672.webp 672w, img/gallery-cajal-data.webp 1344w" sizes="(min-width: 1500px) 25vw, (min-width: 700px) 45vw, 100vw" width="1344" height="768" loading="lazy" alt="A pale ink drawing of the brain outline with a web of thin lines across its centre."><figcaption><strong>Cajal, coloured by the data.</strong> A quieter version where the wiring still shows.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="app" aria-labelledby="app-h">
+  <div class="wrap">
+    <p class="eyebrow">The app</p>
+    <h2 id="app-h">Flyer runs on your own computer.</h2>
+    <p class="lede">Watch the search unfold, spin the brain around in 3D, and dig into where every number came from. The drawing arrives last. It runs best on a GPU (NVIDIA or Apple silicon), and the drawings need ComfyUI with an SDXL model.</p>
+    <div class="shots">
+      <figure><img class="frame" src="img/app-brain-900.webp" srcset="img/app-brain-900.webp 900w, img/app-brain.webp 1800w" sizes="(min-width: 1500px) 50vw, 100vw" width="1800" height="1125" loading="lazy" alt="The Flyer app, 3D brain tab: a dark brain with the neurons that fired glowing white and their strongest connections as thin lines, and the chosen blend listed on the right."><figcaption><strong>3D brain.</strong> The neurons that fired and the strongest links between them, with the answer on the right.</figcaption></figure>
+      <figure><img class="frame" src="img/app-picture-900.webp" srcset="img/app-picture-900.webp 900w, img/app-picture.webp 1800w" sizes="(min-width: 1500px) 50vw, 100vw" width="1800" height="1125" loading="lazy" alt="The Flyer app, picture tab: a finished ink drawing of the brain, with buttons for the line map, strict and free versions, and a chart of how the blend adds up."><figcaption><strong>Picture.</strong> Flip between the free and strict drawings, the line map and the raw data lines.</figcaption></figure>
+    </div>
+    <h3 style="margin-top:3rem">Run it</h3>
+    <pre><code>git clone https://github.com/thepixelabs/flyer && cd flyer
+uv run python scripts/prepare.py      # one-time: downloads the data (~135 MB)
+uv run uvicorn app:app --port 8420    # then open http://localhost:8420</code></pre>
+    <p class="small">The drawings need ComfyUI and two models from Hugging Face. The <a href="https://github.com/thepixelabs/flyer#run">README</a> walks you through it.</p>
+    <h3 style="margin-top:2rem">Or let your AI assistant do the setup</h3>
+    <pre class="prompt"><code>Set up the drawing models for Flyer by following the "Set up drawing" steps in the README at github.com/thepixelabs/flyer. Ask me before you download anything.</code></pre>
+  </div>
+</section>
+
+<section id="limits" aria-labelledby="limits-h">
+  <div class="wrap">
+    <p class="eyebrow">Fair warning</p>
+    <h2 id="limits-h">It isn't what the fly sees.</h2>
+    <div class="cols">
+      <div>
+        <p>We tried to find a picture that, seen through the fly's eyes, would set off the same feeding response. There isn't one. In the simulation, visual input fades out inside the optic lobes. In the wiring itself, vision barely touches the flavour circuit: about 50 times less than it touches random central neurons, and no better than chance. Flies find food with their noses and mouths, and the model agrees. So the drawing is a portrait of the brain's response, not an imagined meal.</p>
+      </div>
+      <div>
+        <h3>What to keep in mind</h3>
+        <ul class="plain">
+          <li>Sugar is always on, because nothing else gets this model to start feeding by itself. The other sugar sensors are left out, so "just add more sugar" can't win.</li>
+          <li>MN9 is one readout of feeding, not the whole story.</li>
+          <li>Every channel is driven at the same 30 Hz. Real tastes and smells vary in strength.</li>
+          <li>The style, and the free drawing's flourishes, come from the image model. The strict version shows what's really data.</li>
+          <li>Nobody knows yet which chemicals the throat taste groups respond to.</li>
+          <li>It's a model: only as good as the wiring map and the simplifications behind it.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="credits" aria-labelledby="credits-h">
+  <div class="wrap">
+    <p class="eyebrow">Credits</p>
+    <h2 id="credits-h">Standing on open science.</h2>
+    <div class="cols">
+      <div>
+        <p>None of this exists without the <strong>FlyWire Consortium</strong> (Princeton University, Janelia Research Campus and the MRC Laboratory of Molecular Biology), who mapped this brain neuron by neuron (the <strong>FlyWire connectome</strong>, materialization 783, shared under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>), and without <strong>Shiu and colleagues</strong>, whose simulation model (MIT) we rebuilt. The pictures and screen results here are derived from that data, and we offer them under CC BY 4.0 too. Please credit FlyWire and cite the papers. No FlyWire root IDs are included, and no endorsement by the authors is implied. Our code is MIT.</p>
+        <p>Drawings are rendered locally with Juggernaut XL v9 (RunDiffusion and KandooAI) and ControlNet Union SDXL ProMax (xinsir). No model weights are distributed.</p>
+        <p><a href="https://github.com/thepixelabs/flyer">Source code and full licence notices on GitHub</a></p>
+      </div>
+      <div>
+        <h3>The papers behind it</h3>
+        <p class="small">If you reuse the data, the model or these results, please cite them.</p>
+        <ol class="cite">
+          <li>Dorkenwald, S. et al. Neuronal wiring diagram of an adult brain. <em>Nature</em> 634, 124–138 (2024). <a href="https://doi.org/10.1038/s41586-024-07558-y">doi:10.1038/s41586-024-07558-y</a></li>
+          <li>Schlegel, P. et al. Whole-brain annotation and multi-connectome cell typing of <em>Drosophila</em>. <em>Nature</em> 634, 139–152 (2024). <a href="https://doi.org/10.1038/s41586-024-07686-5">doi:10.1038/s41586-024-07686-5</a></li>
+          <li>Matsliah, A. et al. Neuronal parts list and wiring diagram for a visual system. <em>Nature</em> 634, 166–180 (2024). <a href="https://doi.org/10.1038/s41586-024-07981-1">doi:10.1038/s41586-024-07981-1</a></li>
+          <li>Berg, S. et al. Sexual dimorphism in the complete <em>Drosophila</em> male central nervous system connectome. <em>Cell</em> 189, 5504–5526.e15 (2026). <a href="https://doi.org/10.1016/j.cell.2026.08.015">doi:10.1016/j.cell.2026.08.015</a></li>
+          <li>Shiu, P. K. et al. A <em>Drosophila</em> computational brain model reveals sensorimotor processing. <em>Nature</em> 634, 210–219 (2024). <a href="https://doi.org/10.1038/s41586-024-07763-9">doi:10.1038/s41586-024-07763-9</a></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Flyer, a small project by <a href="https://pixelabs.net">PixeLabs</a> · <a href="https://github.com/thepixelabs/flyer">Source on GitHub</a></div>
+</footer>
+</body>
+</html>

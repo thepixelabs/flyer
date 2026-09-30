@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flyer</title>
+<meta name="description" content="A copy of a real fruit fly's brain runs on this computer, picks the tastes it likes most, and its response becomes a drawing.">
+<meta name="theme-color" content="#04060b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='11' cy='16' rx='8' ry='7' fill='none' stroke='%237fe3ff' stroke-width='2'/%3E%3Cellipse cx='21' cy='16' rx='8' ry='7' fill='none' stroke='%237fe3ff' stroke-width='2'/%3E%3Ccircle cx='16' cy='21' r='2.5' fill='%23ffb547'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/web/fonts/fonts.css">
+<link rel="stylesheet" href="/web/styles.css">
+<script type="importmap">
+{ "imports": {
+    "three": "/web/vendor/three/build/three.module.js",
+    "three/addons/": "/web/vendor/three/examples/jsm/"
+} }
+</script>
+<script type="module" src="/web/js/main.js"></script>
+</head>
+<body>
+<div class="app" id="app" data-panel="now" data-view="brain" data-stage="idle">
+
+  <!-- top bar: where am I? -->
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Flyer, reload the page"><em>Fly</em>er</a>
+    <ol class="rail" id="rail" aria-label="The six steps of an experiment">
+      <li data-stage="screen"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">1</span> Try everything</li>
+      <li data-stage="retest"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">2</span> Check again</li>
+      <li data-stage="combine"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">3</span> Build a blend</li>
+      <li data-stage="confirm"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">4</span> Confirm</li>
+      <li data-stage="portrait"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">5</span> Map the response</li>
+      <li data-stage="draw"><span class="rail-dot" aria-hidden="true"></span><span class="rail-n">6</span> Draw it</li>
+    </ol>
+    <p class="rail-compact" id="railCompact" aria-hidden="true"></p>
+    <p class="top-status" id="topStatus" role="status" aria-live="polite"></p>
+    <button class="btn ghost small" id="aboutBtn" type="button" aria-haspopup="dialog">What is this?</button>
+  </header>
+
+  <!-- left dock: what is happening now -->
+  <aside class="dock dock-now" id="dockNow" aria-label="What is happening now">
+    <div class="dock-scroll">
+      <p class="eyebrow">A real fly brain, running on this computer</p>
+      <h1>Ask a fly brain what it wants to eat</h1>
+      <p class="lede">A copy of a fruit fly's brain, cell by cell, picks the tastes it likes best. Nobody tells it the
+        answer. Then its response becomes a drawing.</p>
+
+      <div class="controls">
+        <button class="btn primary" id="startBtn" type="button">Ask the fly</button>
+        <p class="run-note" id="runNote">Takes a few minutes. The drawing comes last.</p>
+      </div>
+
+      <fieldset class="draw-settings" id="drawSettings">
+        <legend>How to draw it <button class="tip-i" type="button" aria-label="About these settings"
+          data-tip="These settings are used by Ask the fly, Redraw and Draw this view.">i</button></legend>
+        <div class="set-row">
+          <span class="set-k"><label for="styleSelect">Style</label>
+            <button class="tip-i" id="styleTip" type="button" aria-label="About this style" data-tip="The art style of the drawing.">i</button></span>
+          <select id="styleSelect"></select>
+        </div>
+        <div class="set-row">
+          <span class="set-k"><label for="modelSelect">Model</label>
+            <button class="tip-i" type="button" aria-label="Why only these image models" data-tip-src="modelNoteBody">i</button></span>
+          <select id="modelSelect"><option value="">Juggernaut XL (default)</option></select>
+        </div>
+        <div class="set-row" role="radiogroup" aria-labelledby="paletteLabel">
+          <span class="set-k" id="paletteLabel">Colours</span>
+          <div class="seg radio-seg">
+            <label data-tip="The colours come from the style, like black ink on cream paper."><input type="radio" name="palette" value="ink" checked><span>Ink</span></label>
+            <label data-tip="The drawing starts from the coloured circuit, so its colours show when each cell first fired."><input type="radio" name="palette" value="data"><span>From the data</span></label>
+          </div>
+        </div>
+        <div id="modelNoteBody" class="tip-src" hidden><p>Looking for the image models on this computer&hellip;</p></div>
+      </fieldset>
+
+      <section class="phase-card" id="phaseCard" aria-live="polite">
+        <p class="eyebrow" id="phaseStep">How it works</p>
+        <h2 id="phaseTitle">Four steps, in plain words</h2>
+        <div id="phaseBody"></div>
+      </section>
+
+      <dl class="telemetry" id="telemetry" aria-label="Live numbers">
+        <div><dt data-tip="The clock inside the simulation. Every test lasts one second of the fly's time; the computer needs much longer, so you watch in slow motion.">Simulated time</dt><dd id="tmSim">idle</dd></div>
+        <div><dt data-tip="Copies of the brain the graphics card is working on now: every test in this step, times the repeats of each.">Brains at once</dt><dd id="tmCopies">none</dd></div>
+        <div><dt data-tip="Nerve pulses sent to this page in this step. Only the first copy of each test, and at most 300 pulses per brain in each 25 ms slice.">Spikes received</dt><dd id="tmSpikes">0</dd></div>
+        <div><dt data-tip="Time since the experiment or drawing started.">Elapsed</dt><dd id="tmElapsed">0:00</dd></div>
+        <div><dt data-tip="MN9, the cell that makes the fly reach out to eat: how many times a second it fires with sugar alone, averaged over all copies.">MN9, sugar alone</dt><dd id="tmBase">waiting</dd></div>
+        <div><dt data-tip="MN9 for the test that makes it fire most so far, and which test that is.">MN9, best so far</dt><dd id="tmBest">waiting</dd></div>
+        <div class="tm-wide"><dt id="tmProgLabel">Progress of this step</dt><dd><span class="tm-bar"><i id="tmProg"></i></span></dd></div>
+      </dl>
+      <p class="credits">Data: FlyWire, 2024 (<span data-tip="Dorkenwald and colleagues, 2024; Schlegel and colleagues, 2024. Shared under CC BY 4.0.">CC BY 4.0</span>).
+        Model after <span data-tip="Shiu and colleagues, Nature, 2024.">Shiu and colleagues</span>.</p>
+    </div>
+  </aside>
+
+  <!-- the stage: the one big visual -->
+  <section class="stage" id="stage" aria-label="The main view">
+    <div class="stage-bar">
+      <div class="seg" role="tablist" aria-label="What to show">
+        <button role="tab" type="button" id="tabViewBrain" data-view="brain" aria-selected="true" aria-controls="brainHost">3D brain</button>
+        <button role="tab" type="button" id="tabViewWall" data-view="wall" aria-selected="false" aria-controls="viewWall">Tests<span class="badge" hidden></span></button>
+        <button role="tab" type="button" id="tabViewArt" data-view="art" aria-selected="false" aria-controls="viewArt">Picture<span class="badge" hidden></span></button>
+      </div>
+      <p class="stage-note" id="stageNote"></p>
+      <span class="chip" id="modeChip">Idle</span>
+    </div>
+
+    <!-- tests: one small brain per test in the current step -->
+    <div class="view view-wall" id="viewWall" role="tabpanel" aria-labelledby="tabViewWall">
+      <div class="wall-cap">
+        <p id="wallCap">No tests yet. They appear here when an experiment runs.</p>
+        <ul class="wall-key" aria-label="Key">
+          <li><i class="k-sugar"></i>Sugar alone</li><li><i class="k-taste"></i>Taste</li><li><i class="k-smell"></i>Smell</li><li><i class="k-meter"></i>Feeding neuron</li>
+        </ul>
+      </div>
+      <div class="wall-scroll" id="wallScroll">
+        <div class="wall" id="wall" role="group" aria-label="One small brain per test. Choose one to show it in 3D."></div>
+        <p class="empty" id="wallEmpty">Press <b>Ask the fly</b> to start. You'll see 64 small brains here, each tasting sugar plus one other thing, flashing with their real nerve pulses.</p>
+      </div>
+    </div>
+
+    <!-- the picture: circuit, line map, live previews, drawings -->
+    <div class="view view-art" id="viewArt" role="tabpanel" aria-labelledby="tabViewArt">
+      <div class="art-bar" role="toolbar" aria-label="Which picture to show">
+        <button type="button" data-v="data" aria-pressed="true">Circuit</button>
+        <button type="button" data-v="control" aria-pressed="false">Line map</button>
+        <button type="button" data-v="depth" aria-pressed="false">Depth</button>
+        <button type="button" data-v="strict" aria-pressed="false">Strict</button>
+        <button type="button" data-v="free" aria-pressed="false">Free</button>
+        <span class="art-sep" aria-hidden="true"></span>
+        <button type="button" id="ovBtn" class="toggle" aria-pressed="false">Data lines</button>
+        <button type="button" id="replayDrawBtn" class="toggle" hidden>Watch it form</button>
+        <button type="button" id="redrawBtn" class="toggle redraw" hidden>Redraw</button>
+      </div>
+      <div class="art-frame">
+        <div class="canvas-art" id="canvasArt">
+          <img id="imgData" alt="The circuit: every neuron that fired, at its real position, and the connections between them" hidden>
+          <canvas id="replayCanvas" aria-hidden="true"></canvas>
+          <img id="imgControl" alt="The line map: the structure the image model has to follow" hidden>
+          <img id="imgDepth" alt="Depth map: every neuron at its real 3D position, nearer ones brighter" hidden>
+          <canvas id="linesCanvas" aria-hidden="true" hidden></canvas>
+          <img class="preview" id="preA" alt="" hidden><img class="preview" id="preB" alt="" hidden>
+          <img id="imgStrict" alt="Strict drawing: the model's ink kept only near real data lines" hidden>
+          <img id="imgFree" alt="Free drawing: everything the image model drew over the line map" hidden>
+          <img id="overlay" alt="">
+          <div class="art-step" id="artStep" hidden>
+            <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><circle class="ring-fill" id="ringFill" cx="18" cy="18" r="16" pathLength="100"/></svg>
+            <span><b id="stepN">0</b>/<span id="stepT">30</span></span>
+          </div>
+          <p class="empty art-empty" id="artEmpty">The picture appears here at the end of an experiment. Open a past run in <b>Past runs</b> to see one now.</p>
+        </div>
+      </div>
+      <div class="gallery" id="gallery" role="group" aria-label="Every drawing of this experiment">
+        <p class="gallery-empty" id="galleryEmpty">Every drawing of this experiment will line up here.</p>
+      </div>
+      <p class="art-cap" id="artCap"></p>
+    </div>
+
+    <!-- the 3D brain: the full view, or a band under the tests -->
+    <div class="brain-host" id="brainHost" role="tabpanel" aria-labelledby="tabViewBrain">
+      <div class="brain-canvas" id="brainCanvas" tabindex="0" role="img"
+           aria-label="A 3D view of all the neurons of a fruit fly brain, each at its real position. Drag or use the arrow keys to turn it, scroll or use plus and minus to zoom."></div>
+      <div class="corner c1" aria-hidden="true"></div><div class="corner c2" aria-hidden="true"></div>
+      <div class="corner c3" aria-hidden="true"></div><div class="corner c4" aria-hidden="true"></div>
+      <div class="hud hud-tl">
+        <p class="hud-title" id="viewTitle">A fruit fly's brain</p>
+        <p class="hud-sub" id="viewSub">Every dot is one neuron, at its real position</p>
+      </div>
+      <div class="hud hud-tr" role="toolbar" aria-label="Turn the brain">
+        <button class="hud-btn" data-cam="front" type="button">Front</button>
+        <button class="hud-btn" data-cam="side" type="button">Side</button>
+        <button class="hud-btn" data-cam="top" type="button">Top</button>
+        <button class="hud-btn" id="legendBtn" type="button" aria-expanded="false" aria-controls="legendPanel">Colours</button>
+        <button class="hud-btn only-band" id="expandBrain" type="button">Expand</button>
+      </div>
+      <div class="hud hud-bl">
+        <button class="btn small draw-view" id="drawViewBtn" type="button" hidden>Draw this view</button>
+        <p class="hud-caption" id="viewCaption">Drag to turn it. Scroll or pinch to zoom.</p>
+      </div>
+      <div class="hud hud-br" id="mn9Hud" hidden>
+        <p class="hud-k">Feeding neuron (MN9), times a second</p>
+        <canvas class="spark" id="spark" width="200" height="52" aria-hidden="true"></canvas>
+        <p class="hud-v"><b id="mn9Now">0</b> <span id="mn9Ref"></span></p>
+      </div>
+      <div class="legend-panel" id="legendPanel" hidden>
+        <p class="hud-k">What the colours mean</p>
+        <ul id="legendList"></ul>
+        <p class="legend-note" id="legendMarks"></p>
+      </div>
+      <div class="brain-msg" id="brainMsg" role="status">Loading the neurons&hellip;</div>
+    </div>
+
+    <div class="phase-banner" id="phaseBanner" aria-hidden="true"><span class="pb-n"></span><span class="pb-t"></span></div>
+  </section>
+
+  <!-- right dock: answers, grouped by question -->
+  <aside class="dock dock-info" id="dockInfo" aria-label="Results and explanations">
+    <div class="seg dock-tabs" role="tablist" aria-label="Questions">
+      <button role="tab" type="button" data-panel="choice" id="tabChoice" aria-controls="panelChoice" aria-selected="true">What it chose<span class="badge" hidden></span></button>
+      <button role="tab" type="button" data-panel="sure" id="tabSure" aria-controls="panelSure" aria-selected="false">How sure<span class="badge" hidden></span></button>
+      <button role="tab" type="button" data-panel="picture" id="tabPicture" aria-controls="panelPicture" aria-selected="false">The picture<span class="badge" hidden></span></button>
+      <button role="tab" type="button" data-panel="past" id="tabPast" aria-controls="panelPast" aria-selected="false">Past runs</button>
+    </div>
+
+    <div class="dock-scroll tabpanel" id="panelChoice" role="tabpanel" aria-labelledby="tabChoice">
+      <p class="eyebrow" id="answerEyebrow">What did the fly choose?</p>
+      <div id="answerEmpty" class="empty">The answer appears here once the favourite blend has been confirmed, after
+        the first four steps.</div>
+      <div id="answerBox" hidden>
+        <h2 class="answer" id="answerTitle"></h2>
+        <p class="answer-sub" id="answerSub"></p>
+        <div class="gain" id="gain"></div>
+        <ol class="ingredients" id="ingredients" aria-label="What is in the blend"></ol>
+        <details class="curious" open>
+          <summary>How the blend adds up</summary>
+          <div class="hchart" id="waterfall"></div>
+          <p class="fine" id="wfNote"></p>
+        </details>
+      </div>
+    </div>
+
+    <div class="dock-scroll tabpanel" id="panelSure" role="tabpanel" aria-labelledby="tabSure" hidden>
+      <p class="eyebrow">How sure are we?</p>
+      <div id="sureSummary"><p class="empty">This fills in as the experiment runs: first the check of the promising
+        tastes, then each round of building the blend.</p></div>
+      <div id="retestBox" hidden>
+        <h3 class="sublabel">Checking again</h3>
+        <p class="fine" id="retestLede"></p>
+        <div class="hchart" id="retest"></div>
+      </div>
+      <div id="roundsBox" hidden>
+        <h3 class="sublabel">Building the blend, one round at a time</h3>
+        <ol class="stepper" id="rounds"></ol>
+      </div>
+      <details class="curious">
+        <summary>For the curious: the exact rules</summary>
+        <ul>
+          <li><b>Strength of each input.</b> Sugar sensors are driven at <span data-fill="sugar_hz">80</span> pulses a second
+            the whole time. Each added taste or smell drives its sensor cells at <span data-fill="channel_hz">30</span>.</li>
+          <li><b>Repeats.</b> The first screen runs every test <span data-fill="trials">16</span> times. Checking again uses
+            64, each combining round 48 and the final check 32, each time with fresh random noise.</li>
+          <li><b>Noise.</b> Every number has a &plusmn; value: the standard error, roughly how far the number would move if
+            the whole thing were run again. A result &ldquo;clearly helps&rdquo; when it is more than twice its noise.</li>
+          <li><b>Shortlist.</b> Up to ten channels whose screen gain is bigger than its noise are checked again. Only the
+            ones above twice their noise go on to the rounds.</li>
+          <li><b>Rounds.</b> Each round runs the blend so far next to the blend plus each candidate, under the same
+            conditions. The best one joins if its gain is more than twice the noise. Otherwise the search stops.</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="dock-scroll tabpanel" id="panelPicture" role="tabpanel" aria-labelledby="tabPicture" hidden>
+      <p class="eyebrow">How was the picture made?</p>
+      <div class="card now-showing">
+        <p class="eyebrow" id="showingK">You are looking at</p>
+        <p id="stageLegend">The picture appears at the end of an experiment.</p>
+      </div>
+      <div class="card" id="fidCard">
+        <p class="eyebrow">How much of the drawing is real data <button class="tip-i" type="button" aria-label="How this is measured"
+          data-tip="We take the drawing's strongest lines and check how many sit on a line of the real data, within 4 pixels. The white tick is chance: what lines scattered at random would score. Covers is how much of the data the drawing traces.">i</button></p>
+        <div id="fid"><p class="fine">The scores appear when the drawing is finished.</p></div>
+      </div>
+      <div class="card" id="styleCard">
+        <p class="eyebrow">Drawn as</p>
+        <h3><span id="scLabel">&nbsp;</span> <button class="tip-i" id="scTip" type="button" aria-label="About this style" data-tip="The art style of the drawing.">i</button></h3>
+        <p class="eyebrow">The exact words the image model gets</p>
+        <p class="prompt" id="scPrompt"></p>
+      </div>
+      <details class="curious">
+        <summary>What is data, and what is the image model</summary>
+        <p>It is a portrait of the fly brain's <b>response to its favourite flavour</b>: the cells that fired while it
+          tasted <span id="mBlend">the blend</span>, where they sit, and how they are wired together. It is <b>not a
+          picture of food</b>, and <b>not something the fly sees or imagines</b>. In this wiring the feeding circuit is
+          almost cut off from vision, so there is no picture in its head to show.</p>
+        <p class="eyebrow ok">From the brain data</p>
+        <ul>
+          <li><b>Which cells fired</b> (<span class="nNeur">these</span> of 138,639)</li>
+          <li><b>Where each one sits</b>, seen from the front or from any angle you turn the brain to</li>
+          <li><b>Which are connected</b>, from the FlyWire wiring map</li>
+          <li><b>How often each fired</b>: the size of the dot or circle</li>
+          <li><b>When each first fired</b>: the colour, in the circuit view</li>
+          <li><b>The outline of the brain</b>, from all its cells</li>
+          <li><b>The shape of the brain in depth</b>: the depth map of all 138,639 neurons</li>
+          <li><b>The colours</b>, if you choose colours from the data: they show when each cell first fired</li>
+        </ul>
+        <p class="eyebrow amber">From the image model</p>
+        <ul>
+          <li><b>The medium</b>: ink, paper, brush or blueprint blue (and the colours, if you choose ink colours)</li>
+          <li><b>Texture, shading and the feel of the line</b></li>
+          <li><b>Extra strokes</b> in the free version that aren't in the data (strict removes them)</li>
+          <li>Nothing about <i>where</i> things go. The words only name a style; the shapes come from the line map and the depth map</li>
+        </ul>
+      </details>
+      <details class="curious">
+        <summary>The seven steps from brain to drawing</summary>
+        <ol class="pipeline">
+          <li>
+            <h4>1. The cells that fired</h4>
+            <button class="thumb zoom-dots" type="button" data-go="data" aria-label="Show the circuit"><img class="tData" alt=""><span class="ph">after an experiment</span></button>
+            <p><b class="nNeur">These</b> cells fired while the fly tasted its favourite blend. Each dot sits where that cell
+              really is. A bigger dot fired more often. The colour shows when it first fired, from
+              <span class="ramp" role="img" aria-label="colour scale from orange through pink and blue to green"></span>
+              0 to 60 ms and later: the signal starts at the mouth and spreads.</p>
+          </li>
+          <li>
+            <h4>2. The wires between them</h4>
+            <button class="thumb zoom-lines" type="button" data-go="data" aria-label="Show the circuit"><img class="tData" alt=""><span class="ph">after an experiment</span></button>
+            <p><b class="nEdge">These</b> connections (5 or more synapses, the contact points between cells) join cells that
+              both fired. The picture draws the 3,000 strongest as curves from one cell to the other. The curve is a
+              drawing choice: real wiring follows the cells' branches, which the map doesn't trace.</p>
+          </li>
+          <li>
+            <h4>3. The line map</h4>
+            <button class="thumb" type="button" data-go="control" aria-label="Show the line map"><img class="tControl" alt=""><span class="ph">after an experiment</span></button>
+            <p>Only the structure is kept: the brain's outline, the 900 strongest connections (15 or more synapses) and a
+              circle for each cell, white on black. <b>This and the depth map are the only pictures the image model is given.</b></p>
+          </li>
+          <li>
+            <h4>4. The depth map</h4>
+            <button class="thumb" type="button" data-go="depth" aria-label="Show the depth map"><img class="tDepth" alt=""><span class="ph">after an experiment</span></button>
+            <p>All 138,639 neurons at their real 3D positions, nearer ones brighter. It gives the drawing the real rounded
+              shape of the brain, so shading follows the actual anatomy instead of whatever the model imagines.</p>
+          </li>
+          <li>
+            <h4>5. The image model paints it</h4>
+            <p>An image model is a program that learned to make pictures from many examples. It cleans up speckle step
+              by step into a picture. <b>ControlNet</b> holds its strokes to the line map and its shading to the depth
+              map, and the model paints the style. The words only name a style, never food or a fly, so where the lines
+              go has to come from the data.</p>
+            <p>With <b>ink colours</b> it starts from pure random speckle and the colours come from the style. With
+              <b>colours from the data</b> it starts from the coloured circuit picture instead, so the colours keep
+              showing when each cell first fired.</p>
+            <p>You can turn the 3D brain and press <b>Draw this view</b>: the line map and depth map are made again
+              from that angle, from the same real positions.</p>
+          </li>
+          <li>
+            <h4>6. Strict and free</h4>
+            <div class="pair">
+              <button class="thumb" type="button" data-go="free" aria-label="Show the free drawing"><img class="tFree" alt=""><span class="ph">free</span></button>
+              <button class="thumb" type="button" data-go="strict" aria-label="Show the strict drawing"><img class="tStrict" alt=""><span class="ph">strict</span></button>
+            </div>
+            <p><b>Free</b> is everything the model drew, flourishes included. <b>Strict</b> keeps its ink only near real
+              data lines and fades the rest to the colour of the paper.</p>
+          </li>
+          <li>
+            <h4>7. The honesty score</h4>
+            <p>We find the drawing's strongest lines and check how many lie within 4 pixels of a data line (<b>on
+              data</b>), and how much of the data they trace (<b>covers</b>). <b>Chance</b> is what random lines would
+              score, because part of the canvas is already close to some data line. Strict scores high partly by design,
+              since it erases ink away from the data, so look at its <b>covers</b> score.</p>
+            <p class="mono" id="fidMini"></p>
+          </li>
+        </ol>
+      </details>
+    </div>
+
+    <div class="dock-scroll tabpanel" id="panelPast" role="tabpanel" aria-labelledby="tabPast" hidden>
+      <p class="eyebrow">Past experiments</p>
+      <p class="fine">Compare runs to see how steady the answer is. <b>Redraw</b> uses the settings in <b>How to draw it</b>
+        <button class="tip-i" type="button" aria-label="About redrawing" data-tip="Each run starts from fresh random noise, so comparing runs shows how steady the answer is. Redraw draws a saved experiment again from the front, with the chosen style, model and colours. Nothing is simulated again.">i</button></p>
+      <p class="fine" id="pastNote" role="status" hidden></p>
+      <div class="history-list" id="historyList"><p class="empty">No saved experiments yet.</p></div>
+    </div>
+  </aside>
+
+  <!-- phone: one tab bar for both docks -->
+  <nav class="mobile-tabs seg" aria-label="Panels">
+    <button type="button" data-panel="now" aria-pressed="true">Now</button>
+    <button type="button" data-panel="choice" aria-pressed="false">Choice<span class="badge" hidden></span></button>
+    <button type="button" data-panel="sure" aria-pressed="false">How sure<span class="badge" hidden></span></button>
+    <button type="button" data-panel="picture" aria-pressed="false">Picture<span class="badge" hidden></span></button>
+    <button type="button" data-panel="past" aria-pressed="false">Past</button>
+  </nav>
+</div>
+
+<!-- the welcome story -->
+<dialog class="about" id="about" aria-labelledby="aboutTitle">
+  <div class="about-inner">
+    <header class="about-head">
+      <nav class="about-nav" aria-label="Chapters" id="aboutNav"></nav>
+      <button class="btn ghost small" type="button" id="aboutClose">Close</button>
+    </header>
+    <div class="about-pages" id="aboutPages">
+      <section data-title="What this is">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><ellipse cx="52" cy="45" rx="36" ry="30"/><ellipse cx="108" cy="45" rx="36" ry="30"/><path d="M80 70 v14"/></g><g class="dt"><circle cx="40" cy="36" r="2.5"/><circle cx="58" cy="52" r="2.5"/><circle cx="70" cy="30" r="2.5"/><circle cx="94" cy="38" r="2.5"/><circle cx="112" cy="56" r="2.5"/><circle cx="124" cy="34" r="2.5"/><circle cx="80" cy="60" r="3.5" class="hot"/></g><g class="ln thin"><path d="M40 36 L58 52 L80 60 L112 56 M70 30 L94 38 L124 34 M58 52 L70 30 M94 38 L80 60"/></g></svg>
+        <h2 id="aboutTitle">A fly's brain, asked a simple question</h2>
+        <p>This page runs a copy of a real fruit fly's brain on this computer and asks it one question: of all the
+          things a fly can taste and smell, which ones make it most eager to eat?</p>
+        <p>Nobody gives the brain a menu or tells it what flies like. The answer comes only from how its nerve cells
+          are wired together. At the end, the brain's response is turned into a drawing.</p>
+        <p>You can watch it happen live, turn the brain around in 3D, and see where every number comes from.</p>
+      </section>
+      <section data-title="The brain">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><path d="M20 70 l30 -12 h60 l-30 12 z"/><path d="M20 58 l30 -12 h60 l-30 12 z" opacity=".7"/><path d="M20 46 l30 -12 h60 l-30 12 z" opacity=".5"/><path d="M20 34 l30 -12 h60 l-30 12 z" opacity=".35"/></g><g class="dt"><circle cx="58" cy="28" r="2"/><circle cx="74" cy="40" r="2"/><circle cx="90" cy="52" r="2"/><circle cx="66" cy="64" r="2"/></g><g class="ln thin"><path d="M58 28 L74 40 L90 52 L66 64"/></g></svg>
+        <h2>The brain comes from FlyWire</h2>
+        <p>In 2024 a large team of scientists published <b>FlyWire</b>: a map of every nerve cell in the brain of one
+          adult fruit fly, and of how those cells connect. They built it from very detailed microscope images of the
+          brain, with computers doing much of the tracing and people checking and correcting it.</p>
+        <p>The map has about <b>139,000 neurons</b> (nerve cells) and <b>millions of connections</b> between them.</p>
+        <p>The glowing cloud on this page is that brain. Every dot is one of its neurons, placed where it really sits.
+          The two big wings on the sides are the optic lobes, which handle vision. The taste cells come in at the
+          bottom middle, near the mouth.</p>
+      </section>
+      <section data-title="Making it work">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><circle cx="30" cy="30" r="10"/><circle cx="30" cy="64" r="10"/><circle cx="82" cy="46" r="13"/><path d="M40 33 L69 43 M40 61 L69 50 M95 46 h10"/></g><g class="ln thin"><path d="M108 46 h8 l3 -18 l3 30 l3 -12 h26"/></g></svg>
+        <h2>From a wiring map to a working brain</h2>
+        <p>A wiring map on its own does nothing, much like a road map has no traffic. To bring it to life we treat every
+          neuron as a simple unit that collects signals from the neurons wired into it.</p>
+        <p>When enough signals arrive in a short time, the neuron <b>fires</b>: it sends a brief pulse (a
+          <b>spike</b>) to every neuron it connects to. Some connections push the next neuron toward firing, others
+          hold it back.</p>
+        <p>That rule is all we add. Who signals whom, and how strongly, comes straight from the map. This kind of model
+          comes from a study by Shiu and colleagues (<i>Nature</i>, 2024), who used it to study how a fly decides to
+          feed. Here it runs on this computer's graphics card, often with more than a thousand copies of the brain at once.</p>
+      </section>
+      <section data-title="The question">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><rect x="14" y="40" width="28" height="28" rx="4"/><path d="M56 54 h14 M63 47 v14"/><circle cx="96" cy="54" r="14"/><path d="M126 70 a22 22 0 0 1 22 -22"/><path d="M137 70 l8 -14"/></g><text x="96" y="59" class="q">?</text><g class="ln thin"><path d="M20 34 l6 -10 M28 34 l4 -12 M36 34 l2 -10"/></g></svg>
+        <h2>How we ask it</h2>
+        <p>When a hungry fly tastes something good, it reaches out its <b>proboscis</b> (the little trunk it eats with).
+          One neuron, called <b>MN9</b>, drives that movement. The more often MN9 fires, the stronger the urge to eat.
+          MN9 is our meter.</p>
+        <p><b>Sugar is always being tasted</b> during every test, because in this model nothing else starts feeding on
+          its own. Then we add every other taste and smell the fly has, one at a time, by switching on the sensor
+          cells for it, and watch whether MN9 fires more or less than with sugar alone.</p>
+        <p>Each test lasts one simulated second and is repeated many times with a little random noise, a bit like
+          asking many flies instead of one. The wall of small brains shows these tests as they happen.</p>
+      </section>
+      <section data-title="The search">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><path d="M10 14 h140 l-48 34 v24 l-44 10 v-34 z"/></g><g class="dt"><circle cx="30" cy="22" r="2"/><circle cx="46" cy="24" r="2"/><circle cx="62" cy="22" r="2"/><circle cx="78" cy="24" r="2"/><circle cx="94" cy="22" r="2"/><circle cx="110" cy="24" r="2"/><circle cx="126" cy="22" r="2"/><circle cx="72" cy="60" r="3" class="hot"/><circle cx="86" cy="60" r="3" class="hot"/></g></svg>
+        <h2>Finding the favourite</h2>
+        <p>The search works like a careful tasting competition, in four steps:</p>
+        <ol class="plain-steps">
+          <li><b>Try everything.</b> All 63 other tastes and smells are tried on top of sugar, side by side.</li>
+          <li><b>Check again.</b> The ones that seemed to help are tested again, many more times, so luck can't sneak through.</li>
+          <li><b>Build a blend.</b> The best one joins the blend. Then the rest are tried on top of that blend, one round
+            at a time. Something only joins if it clearly helps.</li>
+          <li><b>Confirm.</b> Plain sugar and the final blend are run again from scratch. That difference is the answer
+            you see.</li>
+        </ol>
+      </section>
+      <section data-title="What it found">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><path d="M16 48 h128"/></g><g class="bars"><rect x="26" y="20" width="16" height="28"/><rect x="50" y="30" width="16" height="18"/><rect x="74" y="34" width="16" height="14"/></g><g class="bars neg"><rect x="104" y="48" width="16" height="30"/></g></svg>
+        <h2>What it found</h2>
+        <p>We ran the whole search six times, each time with different random noise. Every time, the brain picked the
+          same kind of blend: sugar plus <b>water</b>, plus <b>low salt</b>, plus one group of <b>taste cells in the
+          throat</b>. What those throat cells detect in real flies isn't known yet.</p>
+        <p>That blend made the feeding neuron fire about 12 to 16 more times a second than sugar alone.</p>
+        <p>No smell was ever chosen: most smells made the brain less eager to eat, and none clearly helped. Bitter made
+          it much less eager. Real flies like a little salt too, which is a good sign the model behaves sensibly.</p>
+      </section>
+      <section data-title="The picture">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><rect x="10" y="18" width="56" height="56" rx="3"/><rect x="94" y="18" width="56" height="56" rx="3"/><path d="M72 46 h16 m-5 -5 l5 5 l-5 5"/></g><g class="ln thin"><path d="M18 62 C30 30 44 66 58 30 M102 62 C114 30 128 66 142 30"/></g><g class="dt"><circle cx="18" cy="62" r="2"/><circle cx="58" cy="30" r="2"/><circle cx="102" cy="62" r="2.5" class="hot"/><circle cx="142" cy="30" r="2.5" class="hot"/></g></svg>
+        <h2>How the picture is made</h2>
+        <p>Once the answer is confirmed, we look at the final test of the favourite blend: which neurons fired, where
+          they sit, and which of them are wired to each other. That gives a map of dots and lines.</p>
+        <p>An <b>image model</b> (a program that learned to make pictures, also running on this computer) gets two
+          pictures and a few words. The first picture is that <b>line map</b>. The second is a <b>depth map</b>: all
+          138,639 neurons at their real 3D positions, nearer ones brighter, so the drawing takes the real rounded shape
+          of the brain. The words only name a style, like &ldquo;ink drawing on old paper&rdquo;, and never mention food
+          or flies. So the shapes come from the brain, and the model adds the look.</p>
+        <p>You choose the colours. <b>Ink colours</b> come from the style. <b>Colours from the data</b> start the drawing
+          from the coloured circuit, so its colours still show when each cell first fired.</p>
+        <p>You can also turn the 3D brain to any angle and press <b>Draw this view</b>. Both maps are made again from
+          that angle, from the same real positions, and the same experiment is drawn without running it again.</p>
+        <p>Only some image models are offered. Each one was tested by drawing the same saved experiment, and only the
+          ones that stayed faithful to the data lines made the list.</p>
+        <p>The result is a portrait of the brain's response. <b>It is not food, and it is not something the fly sees or
+          imagines.</b> The fly's feeding circuit is almost cut off from its vision, so there is no picture in its head
+          to show. Next to every drawing we score how much of it sits on the real data.</p>
+      </section>
+      <section data-title="What we can't claim">
+        <svg class="illo" viewBox="0 0 160 90" aria-hidden="true"><g class="ln"><circle cx="70" cy="40" r="24"/><path d="M88 58 l26 22"/></g><g class="dt"><circle cx="62" cy="34" r="2.5"/><circle cx="76" cy="46" r="2.5"/></g><g class="ln thin"><path d="M62 34 L76 46"/></g></svg>
+        <h2>What this can't tell us</h2>
+        <ul class="plain-list">
+          <li><b>It is a model.</b> Real neurons are far more complicated than the simple units used here, so this is a
+            careful guess about how the wiring behaves, not a recording from a living fly.</li>
+          <li><b>One readout.</b> MN9 is one sign of wanting to eat, not the whole story of appetite.</li>
+          <li><b>Same strength for everything.</b> Each taste and smell is switched on at the same strength, but real
+            foods and smells differ a lot.</li>
+          <li><b>One fly.</b> The map comes from a single fly's brain.</li>
+          <li><b>The style is the model's.</b> The look of the drawing, and in the free version some extra strokes, come
+            from the image model. The strict version and the score show which parts are data.</li>
+        </ul>
+        <details class="curious">
+          <summary>For the curious: one change we made to the published model</summary>
+          <p>In the original model, some cells in the smell centre that should calm activity down act as if they excite
+            it, so switching on a single smell sensor set off around 10,000 neurons. We made those cells calming unless
+            they are known to be exciting, and gave slow chemical messengers (dopamine, serotonin, octopamine) no fast
+            effect. Smells then reach a few hundred to a couple of thousand neurons, and taste works as before.</p>
+        </details>
+      </section>
+    </div>
+    <footer class="about-foot">
+      <p class="eyebrow" id="aboutCount">1 of 8</p>
+      <a class="eyebrow" href="https://pixelabs.net" target="_blank" rel="noopener">A PixeLabs project</a>
+      <div>
+        <button class="btn ghost" type="button" id="aboutPrev">Back</button>
+        <button class="btn primary" type="button" id="aboutNext">Next</button>
+      </div>
+    </footer>
+  </div>
+</dialog>
+</body>
+</html>
